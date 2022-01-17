@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-tree
-      :data="data"
+      :data="menus"
       :props="defaultProps"
       @node-click="handleNodeClick"
     ></el-tree>
@@ -12,10 +12,10 @@
 export default {
   data() {
     return {
-      data: [],
+      menus: [],
       defaultProps: {
         children: "children",
-        label: "label",
+        label: "name",
       },
     };
   },
@@ -24,21 +24,22 @@ export default {
       console.log(data);
     },
     // 获取数据列表
-    getMenus () {
-        this.dataListLoading = true
-        this.$http({
-            url: this.$http.adornUrl('/product/category/list/tree'),
-            method: 'get'
-        }).then(data=>{
-            console.log("成功获取到菜单数据...",data)
-        })
-    }
+    getMenus() {
+      this.dataListLoading = true;
+      this.$http({
+        url: this.$http.adornUrl("/product/category/list/tree"),
+        method: "get",
+      }).then(({ data }) => {
+        console.log("成功获取到菜单数据...", data.data);
+        this.menus = data.data;
+      });
+    },
   },
   //生命周期-创建完成（可以访问当前this实例）
-  created(){
-      //一旦创建组件，就调用该方法发起请求获取数据
-      this.getMenus();
-  }
+  created() {
+    //一旦创建组件，就调用该方法发起请求获取数据
+    this.getMenus();
+  },
 };
 </script>
 
