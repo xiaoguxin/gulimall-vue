@@ -50,14 +50,30 @@ export default {
     },
     remove(node, data) {
       var ids = [data.catId];
-      this.$http({
-        url: this.$http.adornUrl("/product/category/delete"),
-        method: "post",
-        data: this.$http.adornData(ids, false),
-      }).then(({ data }) => {
-        console.log("刪除成功");
-        this.getMenus();
-      });
+      this.$confirm(`是否删除【${data.name}】菜单?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.$http({
+            url: this.$http.adornUrl("/product/category/delete"),
+            method: "post",
+            data: this.$http.adornData(ids, false),
+          }).then(({ data }) => {
+            this.$message({
+              type: "success",
+              message: "菜单删除成功!",
+            });
+            this.getMenus();
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
       console.log("remove", node, data);
     },
     handleNodeClick(data) {
