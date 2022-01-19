@@ -6,6 +6,7 @@
       @node-click="handleNodeClick"
       show-checkbox
       node-key="catId"
+      :default-expanded-keys="expandedKey"
       :expand-on-click-node="false"
     >
       <span class="custom-tree-node" slot-scope="{ node, data }">
@@ -38,6 +39,7 @@ export default {
   data() {
     return {
       menus: [],
+      expandedKey: [],
       defaultProps: {
         children: "children",
         label: "name",
@@ -50,6 +52,7 @@ export default {
     },
     remove(node, data) {
       var ids = [data.catId];
+      //var parentCid=data.parentCid;
       this.$confirm(`是否删除【${data.name}】菜单?`, "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -65,7 +68,11 @@ export default {
               type: "success",
               message: "菜单删除成功!",
             });
+            //刷新出新菜单
             this.getMenus();
+            //设置展开
+            this.expandedKey = [node.parent.data.catId];
+            //this.expandedKey = [parentCid]
           });
         })
         .catch(() => {
