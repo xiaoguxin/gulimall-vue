@@ -49,13 +49,14 @@ export default {
       console.log("append", data);
     },
     remove(node, data) {
-      var ids=[data.catId]
+      var ids = [data.catId];
       this.$http({
         url: this.$http.adornUrl("/product/category/delete"),
         method: "post",
         data: this.$http.adornData(ids, false),
       }).then(({ data }) => {
         console.log("刪除成功");
+        this.getMenus();
       });
       console.log("remove", node, data);
     },
