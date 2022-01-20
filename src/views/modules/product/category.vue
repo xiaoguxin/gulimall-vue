@@ -31,6 +31,17 @@
         </span>
       </span>
     </el-tree>
+    <el-dialog title="提示" :visible.sync="dialogVisible" width="30%">
+      <el-form :model="category">
+        <el-form-item label="活动名称">
+          <el-input v-model="category.name" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addCategory()">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -38,6 +49,8 @@
 export default {
   data() {
     return {
+      category: { name: "", parentCid: 0, catLevel: 0, showStatus: 1, sort: 0 },
+      dialogVisible: false,
       menus: [],
       expandedKey: [],
       defaultProps: {
@@ -47,9 +60,6 @@ export default {
     };
   },
   methods: {
-    append(data) {
-      console.log("append", data);
-    },
     remove(node, data) {
       var ids = [data.catId];
       //var parentCid=data.parentCid;
@@ -82,6 +92,33 @@ export default {
           });
         });
       console.log("remove", node, data);
+    },
+    append(data) {
+      this.dialogVisible = true;
+      this.category.parentCid = data.catId;
+      this.category.catLevel = data.catLevel * 1 + 1;
+      console.log("append", data);
+    },
+    addCategory() {
+      console.log("提交表单数据", this.category);
+      this.$http({
+        url: this.$http.adornUrl("/product/category/save"),
+        method: "post",
+        data: this.$http.adornData(this.category, false),
+      }).then(({ data }) => {
+        this.$message({
+          type: "success",
+          message: "菜单保存成功!",
+        });
+        //关闭弹框
+        this.dialogVisible = false;
+        //刷新出新菜单
+        this.getMenus();
+        //设置展开
+        this.expandedKey = [this.category.parentCid];
+        //清空表单，防止二次回显
+        this.category = {};
+      });
     },
     handleNodeClick(data) {
       console.log(data);
