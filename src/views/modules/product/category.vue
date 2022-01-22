@@ -237,15 +237,14 @@ export default {
       console.log("深度--：", deep);
 
       //拖拽完maxLevel恢复默认值
-      this.maxLevel=0;
-      
+      this.maxLevel = 0;
+
       //this.maxLevel
       if (type == "inner") {
         return deep + dropNode.level <= 3;
       } else {
         return deep + dropNode.parent.level <= 3;
       }
-      
     },
     countNodeLevel(node) {
       //找到所有子节点，求出最大深度
