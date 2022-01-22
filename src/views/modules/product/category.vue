@@ -9,6 +9,7 @@
       :default-expanded-keys="expandedKey"
       :expand-on-click-node="false"
       draggable
+      :allow-drop="allowDrop"
     >
       <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
@@ -221,6 +222,10 @@ export default {
           });
         });
       console.log("remove", node, data);
+    },
+    //控制拖拽时判定目标节点能否被放置
+    allowDrop(draggingNode, dropNode, type) {
+      return false;
     },
     handleNodeClick(data) {
       //console.log(data);
