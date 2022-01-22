@@ -34,7 +34,12 @@
         </span>
       </span>
     </el-tree>
-    <el-dialog :title="title" :visible.sync="dialogVisible" width="30%">
+    <el-dialog
+      :title="title"
+      :visible.sync="dialogVisible"
+      width="30%"
+      :close-on-click-modal="false"
+    >
       <el-form :model="category">
         <el-form-item label="分类名称">
           <el-input v-model="category.name" autocomplete="off"></el-input>
