@@ -8,6 +8,7 @@
       node-key="catId"
       :default-expanded-keys="expandedKey"
       :expand-on-click-node="false"
+      draggable
     >
       <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
