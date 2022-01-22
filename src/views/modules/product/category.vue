@@ -104,8 +104,16 @@ export default {
       this.title = "添加分类";
       this.dialogType = "add";
       this.dialogVisible = true;
+      //添加所需数据
       this.category.parentCid = data.catId;
       this.category.catLevel = data.catLevel * 1 + 1;
+      //设置回默认值
+      this.category.name = "";
+      this.category.catId = null; //自增
+      this.category.icon = "";
+      this.category.productUnit = "";
+      this.category.sort = 0;
+      this.category.showStatus = 1;
       console.log("append", data);
     },
     edit(data) {
