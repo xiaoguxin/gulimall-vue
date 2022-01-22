@@ -20,6 +20,9 @@
           >
             Append
           </el-button>
+          <el-button type="text" size="mini" @click="() => edit(data)">
+            Edit
+          </el-button>
           <el-button
             v-if="node.childNodes.length == 0"
             type="text"
@@ -31,15 +34,24 @@
         </span>
       </span>
     </el-tree>
-    <el-dialog title="提示" :visible.sync="dialogVisible" width="30%">
+    <el-dialog :title="title" :visible.sync="dialogVisible" width="30%">
       <el-form :model="category">
-        <el-form-item label="活动名称">
+        <el-form-item label="分类名称">
           <el-input v-model="category.name" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="图标">
+          <el-input v-model="category.icon" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="计量单位">
+          <el-input
+            v-model="category.productUnit"
+            autocomplete="off"
+          ></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addCategory()">确 定</el-button>
+        <el-button type="primary" @click="submitData()">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -49,7 +61,18 @@
 export default {
   data() {
     return {
-      category: { name: "", parentCid: 0, catLevel: 0, showStatus: 1, sort: 0 },
+      title: "",
+      dialogType: "", //edit,add
+      category: {
+        name: "",
+        parentCid: 0,
+        catLevel: 0,
+        showStatus: 1,
+        sort: 0,
+        productUnit: "",
+        icon: "",
+        catId: null,
+      },
       dialogVisible: false,
       menus: [],
       expandedKey: [],
@@ -60,6 +83,98 @@ export default {
     };
   },
   methods: {
+    // 获取数据列表
+    getMenus() {
+      this.dataListLoading = true;
+      this.$http({
+        url: this.$http.adornUrl("/product/category/list/tree"),
+        method: "get",
+      }).then(({ data }) => {
+        console.log("成功获取到菜单数据...", data.data);
+        this.menus = data.data;
+      });
+    },
+
+    append(data) {
+      this.title = "添加分类";
+      this.dialogType = "add";
+      this.dialogVisible = true;
+      this.category.parentCid = data.catId;
+      this.category.catLevel = data.catLevel * 1 + 1;
+      console.log("append", data);
+    },
+    edit(data) {
+      console.log("edit", data);
+      this.title = "修改分类";
+      this.dialogType = "edit";
+      this.dialogVisible = true;
+      //编辑的数据：通过发送请求获取当前节点最新的数据
+      //this.category.name = data.name;
+      //this.category.catId= data.catId;
+      this.$http({
+        url: this.$http.adornUrl(`/product/category/info/${data.catId}`),
+        method: "get",
+      }).then(({ data }) => {
+        //请求成功
+        console.log("成功获取到节点的数据(要回显的数据)...", data);
+        this.category.name = data.data.name;
+        this.category.catId = data.data.catId;
+        this.category.icon = data.data.icon;
+        this.category.productUnit = data.data.productUnit;
+        this.category.parentCid = data.data.parentCid;
+      });
+    },
+    submitData() {
+      if (this.dialogType == "add") {
+        this.addCategory();
+      }
+      if (this.dialogType == "edit") {
+        this.editCategory();
+      }
+    },
+    //修改分类数据
+    editCategory() {
+      console.log("编辑表单数据", this.category);
+      //解构出需要编辑的字段
+      var { catId, name, icon, productUnit } = this.category;
+
+      this.$http({
+        url: this.$http.adornUrl("/product/category/update"),
+        method: "post",
+        data: this.$http.adornData({ catId, name, icon, productUnit }, false),
+      }).then(({ data }) => {
+        this.$message({
+          type: "success",
+          message: "菜单修改成功!",
+        });
+        //关闭弹框
+        this.dialogVisible = false;
+        //刷新出新菜单
+        this.getMenus();
+        //设置展开
+        this.expandedKey = [this.category.parentCid];
+      });
+    },
+    //添加分类数据
+    addCategory() {
+      console.log("提交表单数据", this.category);
+      this.$http({
+        url: this.$http.adornUrl("/product/category/save"),
+        method: "post",
+        data: this.$http.adornData(this.category, false),
+      }).then(({ data }) => {
+        this.$message({
+          type: "success",
+          message: "菜单保存成功!",
+        });
+        //关闭弹框
+        this.dialogVisible = false;
+        //刷新出新菜单
+        this.getMenus();
+        //设置展开
+        this.expandedKey = [this.category.parentCid];
+      });
+    },
     remove(node, data) {
       var ids = [data.catId];
       //var parentCid=data.parentCid;
@@ -93,46 +208,10 @@ export default {
         });
       console.log("remove", node, data);
     },
-    append(data) {
-      this.dialogVisible = true;
-      this.category.parentCid = data.catId;
-      this.category.catLevel = data.catLevel * 1 + 1;
-      console.log("append", data);
-    },
-    addCategory() {
-      console.log("提交表单数据", this.category);
-      this.$http({
-        url: this.$http.adornUrl("/product/category/save"),
-        method: "post",
-        data: this.$http.adornData(this.category, false),
-      }).then(({ data }) => {
-        this.$message({
-          type: "success",
-          message: "菜单保存成功!",
-        });
-        //关闭弹框
-        this.dialogVisible = false;
-        //刷新出新菜单
-        this.getMenus();
-        //设置展开
-        this.expandedKey = [this.category.parentCid];
-        //清空表单，防止二次回显
-        this.category = {};
-      });
-    },
     handleNodeClick(data) {
-      console.log(data);
-    },
-    // 获取数据列表
-    getMenus() {
-      this.dataListLoading = true;
-      this.$http({
-        url: this.$http.adornUrl("/product/category/list/tree"),
-        method: "get",
-      }).then(({ data }) => {
-        console.log("成功获取到菜单数据...", data.data);
-        this.menus = data.data;
-      });
+      //console.log(data);
+      //this.dialogVisible = true;
+      //this.category.name = data.name;
     },
   },
   //生命周期-创建完成（可以访问当前this实例）
