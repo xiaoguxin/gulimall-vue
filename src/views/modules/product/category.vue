@@ -232,30 +232,59 @@ export default {
       console.log("allowDrop", draggingNode, dropNode, type);
       //
       this.countNodeLevel(draggingNode.data);
+      console.log("this.maxLevel--：", this.maxLevel);
       //当前正在拖动的节点+父节点所在的深度不大于3即可
       let deep = this.maxLevel - draggingNode.data.catLevel + 1;
-      console.log("深度--：", deep);
+      console.log("节点携带层数（深度）--：", deep);
 
       //拖拽完maxLevel恢复默认值
       this.maxLevel = 0;
 
       //this.maxLevel
       if (type == "inner") {
-        return deep + dropNode.level <= 3;
+        if (deep + dropNode.level <= 3) {
+          console.log("inner：移动成功");
+          return true;
+        } else {
+          console.log("inner：移动失败");
+          return false;
+        }
+        //return deep + dropNode.level <= 3;
       } else {
-        return deep + dropNode.parent.level <= 3;
+        if (deep + dropNode.parent.level <= 3) {
+          console.log("移动成功");
+          return true;
+        } else {
+          console.log("移动失败");
+          return false;
+        }
+        //return deep + dropNode.parent.level <= 3;
       }
     },
     countNodeLevel(node) {
       //找到所有子节点，求出最大深度
-      if (node.children != null && node.children.length > 0) {
-        for (let i = 0; i < node.children.length; i++) {
-          if (node.children[i].catLevel > this.maxLevel) {
-            this.maxLevel = node.children[i].catLevel;
+      if (node.children != null) {
+        if (node.children.length > 0) {
+          for (let i = 0; i < node.children.length; i++) {
+            if (node.children[i].catLevel > this.maxLevel) {
+              this.maxLevel = node.children[i].catLevel;
+            }
+            this.countNodeLevel(node.children[i]);
           }
-          this.countNodeLevel(node.children[i]);
+        } else {
+          console.log("node.children.length<=0");
+          this.maxLevel = node.catLevel;
         }
       }
+
+      // if (node.children != null && node.children.length > 0) {
+      //   for (let i = 0; i < node.children.length; i++) {
+      //     if (node.children[i].catLevel > this.maxLevel) {
+      //       this.maxLevel = node.children[i].catLevel;
+      //     }
+      //     this.countNodeLevel(node.children[i]);
+      //   }
+      // }
     },
     handleNodeClick(data) {
       //console.log(data);
