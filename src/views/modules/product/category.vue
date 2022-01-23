@@ -276,7 +276,7 @@ export default {
           this.maxLevel = node.catLevel;
         }
       }
-
+      // 
       // if (node.children != null && node.children.length > 0) {
       //   for (let i = 0; i < node.children.length; i++) {
       //     if (node.children[i].catLevel > this.maxLevel) {
