@@ -282,6 +282,23 @@ export default {
       console.log("updateNodes", this.updateNodes);
 
       //3.当前拖拽节点的最新层级（更新拖拽节点层级和子节点的层级）
+
+      this.$http({
+        url: this.$http.adornUrl("/product/category/update/list"),
+        method: "post",
+        data: this.$http.adornData(this.updateNodes, false),
+      }).then(({ data }) => {
+        this.$message({
+          type: "success",
+          message: "菜单拖拽更新成功!",
+        });
+        //刷新出新菜单
+        this.getMenus();
+        //设置展开
+        this.expandedKey = [pCid];
+        this.updateNodes = [];
+        this.maxLevel = 0;
+      });
     },
     updateChildNodeLevel(node) {
       if (node.childNodes.length > 0) {
