@@ -6,6 +6,7 @@
       inactive-text="关闭拖拽"
     >
     </el-switch>
+    <el-button v-if="draggable" @click="batchSave">批量保存</el-button>
     <el-tree
       :data="menus"
       :props="defaultProps"
@@ -75,6 +76,7 @@
 export default {
   data() {
     return {
+      pCid: [],
       draggable: false,
       updateNodes: [],
       maxLevel: 0,
@@ -233,6 +235,25 @@ export default {
         });
       console.log("remove", node, data);
     },
+    batchSave() {
+      this.$http({
+        url: this.$http.adornUrl("/product/category/update/list"),
+        method: "post",
+        data: this.$http.adornData(this.updateNodes, false),
+      }).then(({ data }) => {
+        this.$message({
+          type: "success",
+          message: "菜单拖拽更新成功!",
+        });
+        //刷新出新菜单
+        this.getMenus();
+        //设置展开
+        this.expandedKey = this.pCid;
+        this.updateNodes = [];
+        this.maxLevel = 0;
+        //this.pCid = 0;
+      });
+    },
     handleDrop(draggingNode, dropNode, dropType, ev) {
       console.log("handleDrop: ", draggingNode, dropNode, dropType);
       //1.当前拖动节点后最新的父id
@@ -246,6 +267,7 @@ export default {
       } else {
         pCid = dropNode.data.catId;
       }
+      this.pCid.push(pCid);
 
       //2.当前拖拽节点的最新顺序（更新拖拽节点顺序和父级id,更新节点兄弟节点顺序）
       let siblings = null;
@@ -289,23 +311,6 @@ export default {
       console.log("updateNodes", this.updateNodes);
 
       //3.当前拖拽节点的最新层级（更新拖拽节点层级和子节点的层级）
-
-      this.$http({
-        url: this.$http.adornUrl("/product/category/update/list"),
-        method: "post",
-        data: this.$http.adornData(this.updateNodes, false),
-      }).then(({ data }) => {
-        this.$message({
-          type: "success",
-          message: "菜单拖拽更新成功!",
-        });
-        //刷新出新菜单
-        this.getMenus();
-        //设置展开
-        this.expandedKey = [pCid];
-        this.updateNodes = [];
-        this.maxLevel = 0;
-      });
     },
     updateChildNodeLevel(node) {
       if (node.childNodes.length > 0) {
@@ -327,10 +332,10 @@ export default {
       //1）、被拖动的当前节点总层数
       console.log("allowDrop", draggingNode, dropNode, type);
       //
-      this.countNodeLevel(draggingNode.data);
+      this.countNodeLevel(draggingNode);
       console.log("this.maxLevel--：", this.maxLevel);
       //当前正在拖动的节点+父节点所在的深度不大于3即可
-      let deep = this.maxLevel - draggingNode.data.catLevel + 1;
+      let deep = this.maxLevel - draggingNode.level + 1;
       console.log("节点携带层数（深度）--：", deep);
 
       //拖拽完maxLevel恢复默认值
@@ -359,17 +364,17 @@ export default {
     },
     countNodeLevel(node) {
       //找到所有子节点，求出最大深度
-      if (node.children != null) {
-        if (node.children.length > 0) {
-          for (let i = 0; i < node.children.length; i++) {
-            if (node.children[i].catLevel > this.maxLevel) {
-              this.maxLevel = node.children[i].catLevel;
+      if (node.childNodes != null) {
+        if (node.childNodes.length > 0) {
+          for (let i = 0; i < node.childNodes.length; i++) {
+            if (node.childNodes[i].level > this.maxLevel) {
+              this.maxLevel = node.childNodes[i].level;
             }
-            this.countNodeLevel(node.children[i]);
+            this.countNodeLevel(node.childNodes[i]);
           }
         } else {
-          console.log("node.children.length<=0");
-          this.maxLevel = node.catLevel;
+          console.log("node.childNodes.length<=0");
+          this.maxLevel = node.level;
         }
       }
 
