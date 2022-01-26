@@ -1,5 +1,11 @@
 <template>
   <div>
+    <el-switch
+      v-model="draggable"
+      active-text="开启拖拽"
+      inactive-text="关闭拖拽"
+    >
+    </el-switch>
     <el-tree
       :data="menus"
       :props="defaultProps"
@@ -8,7 +14,7 @@
       node-key="catId"
       :default-expanded-keys="expandedKey"
       :expand-on-click-node="false"
-      draggable
+      :draggable="draggable"
       :allow-drop="allowDrop"
       @node-drop="handleDrop"
     >
@@ -69,6 +75,7 @@
 export default {
   data() {
     return {
+      draggable: false,
       updateNodes: [],
       maxLevel: 0,
       title: "",
