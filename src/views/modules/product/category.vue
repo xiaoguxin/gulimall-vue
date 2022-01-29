@@ -238,8 +238,39 @@ export default {
       console.log("remove", node, data);
     },
     batchDelete() {
+      let catIds = [];
+      let catNames = [];
       let checkedNodes = this.$refs.menuTree.getCheckedNodes();
       console.log("被选中的元素", checkedNodes);
+      for (let i = 0; i < checkedNodes.length; i++) {
+        catIds.push(checkedNodes[i].catId);
+        catNames.push(checkedNodes[i].name);
+      }
+      this.$confirm(`是否批量删除【${catNames}】菜单?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.$http({
+            url: this.$http.adornUrl("/product/category/delete"),
+            method: "post",
+            data: this.$http.adornData(catIds, false),
+          }).then(({ data }) => {
+            this.$message({
+              type: "success",
+              message: "菜单批量删除成功!",
+            });
+            //刷新出新菜单(可能多人删除)
+            this.getMenus();
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消批量删除",
+          });
+        });
     },
     batchSave() {
       this.$http({
