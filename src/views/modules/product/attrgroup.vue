@@ -1,7 +1,7 @@
 <template>
   <el-row :gutter="20">
     <el-col :span="6">
-      <category></category>
+      <category @tree-node-click="treenodeclick"></category>
     </el-col>
     <el-col :span="18">
       <div class="mod-config">
@@ -135,7 +135,12 @@
 </template>
 
 <script>
-
+/**
+ * 父子组件传递数据
+ * 1)、子组件给父组件传递数据，事件机制；
+ *     子组件给父组件发送一个事件，携带上数据。
+ * // this.$emit("事件名", 携带的数据...)
+ */
 import Category from "../common/category";
 import AddOrUpdate from './attrgroup-add-or-update'
 export default {
@@ -181,6 +186,11 @@ export default {
         }
         this.dataListLoading = false;
       });
+    },
+    //感知树节点被点击
+    treenodeclick(data,node,component){
+        console.log("attrgroup感知到category的节点被点击:",data,node,component);
+        console.log("刚才被点击的菜单id:",data.catId)
     },
     // 每页数
     sizeChangeHandle(val) {
