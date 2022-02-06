@@ -146,6 +146,7 @@ import AddOrUpdate from './attrgroup-add-or-update'
 export default {
   data() {
     return {
+      catId:0,
       dataForm: {
         key: "",
       },
@@ -169,7 +170,7 @@ export default {
     getDataList() {
       this.dataListLoading = true;
       this.$http({
-        url: this.$http.adornUrl("/product/attrgroup/list"),
+        url: this.$http.adornUrl(`/product/attrgroup/list/${this.catId}`),
         method: "get",
         params: this.$http.adornParams({
           page: this.pageIndex,
@@ -190,7 +191,13 @@ export default {
     //感知树节点被点击
     treenodeclick(data,node,component){
         console.log("attrgroup感知到category的节点被点击:",data,node,component);
-        console.log("刚才被点击的菜单id:",data.catId)
+        console.log("刚才被点击的菜单id:",data.catId);
+        if(node.level == 3){
+            this.catId = data.catId
+            this.getDataList();//重新查询
+
+        }
+
     },
     // 每页数
     sizeChangeHandle(val) {
