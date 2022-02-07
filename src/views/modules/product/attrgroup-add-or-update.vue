@@ -3,7 +3,7 @@
     :title="!dataForm.attrGroupId ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible"
-    @closed=""
+    @closed="dialogClose"
   >
     <el-form
       :model="dataForm"
@@ -79,6 +79,9 @@ export default {
     };
   },
   methods: {
+    dialogClose(){
+      this.dataForm.catelogPath = [];
+    },
     // 获取数据列表
     getCategorys() {
       this.dataListLoading = true;
