@@ -80,7 +80,7 @@ export default {
   },
   methods: {
     dialogClose(){
-      this.dataForm.catelogPath = [];
+      this.dataForm.catelogPath = []
     },
     // 获取数据列表
     getCategorys() {
