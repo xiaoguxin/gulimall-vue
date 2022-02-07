@@ -3,6 +3,7 @@
     :title="!dataForm.attrGroupId ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible"
+    @closed=""
   >
     <el-form
       :model="dataForm"
@@ -108,6 +109,8 @@ export default {
               this.dataForm.descript = data.attrGroup.descript;
               this.dataForm.icon = data.attrGroup.icon;
               this.dataForm.catelogId = data.attrGroup.catelogId;
+              //查出catelogId的完整路径
+              data.attrGroup.catelogPath = data.attrGroup.catelogPath;
             }
           });
         }
