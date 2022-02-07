@@ -110,7 +110,7 @@ export default {
               this.dataForm.icon = data.attrGroup.icon;
               this.dataForm.catelogId = data.attrGroup.catelogId;
               //查出catelogId的完整路径
-              data.attrGroup.catelogPath = data.attrGroup.catelogPath;
+              this.dataForm.catelogIds = data.attrGroup.catelogPath;
             }
           });
         }
