@@ -5,6 +5,7 @@
         <el-form-item label="分类">
           <category-cascader :catelogPath.sync="catelogPath"></category-cascader>
         </el-form-item>
+        <!-- 品牌的显示根据选择的分类才可选-->
         <el-form-item label="品牌">
           <brand-select style="width:160px"></brand-select>
         </el-form-item>
